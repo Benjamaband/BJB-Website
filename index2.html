@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BJ Band</title>
+
+    <!-- CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> <!--Tailwind-->
+    <!-- <link rel="stylesheet" href="style.css"> -->
+     <!-- FONT -->
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto px-4 py-6">
+        <div class="bg-white rounded-lg shadow-md p-6 flex flex-col">
+            <!-- Container HEAD -->
+            <div class="flex flex-row"> 
+                <div>เช็กชื่อ</div>
+                <div class="flex flex-row space-x-4">
+                    <div>
+                        <input type="date" id="attendance-date" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <select id="filter-section" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">ทุก Section</option>
+                            <option value="flute">Flute</option>
+                            <option value="clarinet">Clarinet</option>
+                            <option value="saxophone">Saxophone</option>
+                            <option value="trumpet">Trumpet</option>
+                            <option value="horn">Horn in F</option>
+                            <option value="euphonium">Euphonium</option>
+                            <option value="trombone">Trombone</option>
+                            <option value="tuba">Tuba</option>
+                            <option value="percussion">Percussion</option>
+                            <option value="chorus">Chorus</option>
+                        </select>
+                    </div>
+                    <div>
+                        <select id="filter-class" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">ทุกระดับชั้น</option>
+                            <option value="ม.1">ม.1</option>
+                            <option value="ม.2">ม.2</option>
+                            <option value="ม.3">ม.3</option>
+                            <option value="ม.4">ม.4</option>
+                            <option value="ม.5">ม.5</option>
+                            <option value="ม.6">ม.6</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+        <!-- สรุปเช็กชื่อ -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6 auth-required hidden">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">สรุปการเช็คชื่อวันนี้</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-green-500 rounded-full p-2 mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">มาซ้อม</p>
+                                <p class="text-xl font-bold text-gray-800"><span id="present-count">0</span> คน</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-red-500 rounded-full p-2 mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">ไม่มาซ้อม</p>
+                                <p class="text-xl font-bold text-gray-800"><span id="absent-count">0</span> คน</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-100 p-4 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-500 rounded-full p-2 mr-3">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600">ลา</p>
+                                <p class="text-xl font-bold text-gray-800"><span id="leave-count">0</span> คน</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="bg-gray-100 rounded-lg p-4">
+                        <p class="text-sm text-gray-600">เปอร์เซ็นต์การมาซ้อม</p>
+                        <div class="flex items-center">
+                            <div class="w-full bg-gray-200 rounded-full h-4 mr-2">
+                                <div id="attendance-percentage-bar" class="bg-green-500 h-4 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <span id="attendance-percentage" class="text-sm font-medium">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Reports Page -->
+        <div id="reports-page" class="page-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">รายงานสรุปการเข้าซ้อม</h2>
+                
+                <div class="flex flex-col md:flex-row md:space-x-4 mb-6">
+                    <div class="w-full md:w-1/2 mb-4 md:mb-0">
+                        <div class="bg-white border rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-4">สรุปภาพรวม</h3>
+                            <canvas id="attendance-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <div class="bg-white border rounded-lg p-4">
+                            <h3 class="text-lg font-semibold mb-4">แนวโน้มการเข้าซ้อม</h3>
+                            <canvas id="trend-chart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">รายงานรายบุคคล</h3>
+                    <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4 mb-4">
+                        <div class="relative">
+                            <select id="report-filter-section" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="all">ทุก Section</option>
+                                <option value="flute">Flute</option>
+                                <option value="clarinet">Clarinet</option>
+                                <option value="saxophone">Saxophone</option>
+                                <option value="trumpet">Trumpet</option>
+                                <option value="horn">Horn in F</option>
+                                <option value="euphonium">Euphonium</option>
+                                <option value="trombone">Trombone</option>
+                                <option value="tuba">Tuba</option>
+                                <option value="percussion">Percussion</option>
+                                <option value="chorus">Chorus</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <select id="report-filter-class" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="all">ทุกระดับชั้น</option>
+                                <option value="ม.1">ม.1</option>
+                                <option value="ม.2">ม.2</option>
+                                <option value="ม.3">ม.3</option>
+                                <option value="ม.4">ม.4</option>
+                                <option value="ม.5">ม.5</option>
+                                <option value="ม.6">ม.6</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <input type="text" id="report-search-student" placeholder="ค้นหานักเรียน" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                    <th class="py-3 px-6 text-left">รูป</th>
+                                    <th class="py-3 px-6 text-left">เลขประจำตัว</th>
+                                    <th class="py-3 px-6 text-left">ชื่อ-นามสกุล</th>
+                                    <th class="py-3 px-6 text-left">ระดับชั้น</th>
+                                    <th class="py-3 px-6 text-left">Section</th>
+                                    <th class="py-3 px-6 text-center">มาซ้อม</th>
+                                    <th class="py-3 px-6 text-center">ไม่มาซ้อม</th>
+                                    <th class="py-3 px-6 text-center">ลา</th>
+                                    <th class="py-3 px-6 text-center">เปอร์เซ็นต์</th>
+                                    <th class="py-3 px-6 text-center">รายละเอียด</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-report-list" class="text-gray-600 text-sm">
+                                <!-- Student report rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-4">รายงานตาม Section</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-medium mb-2">เปอร์เซ็นต์การมาซ้อมตาม Section</h4>
+                            <canvas id="section-chart" height="200"></canvas>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-medium mb-2">เปอร์เซ็นต์การมาซ้อมตามระดับชั้น</h4>
+                            <canvas id="class-chart" height="200"></canvas>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <h4 class="font-medium mb-2">วันที่มีการเข้าซ้อมมากที่สุด</h4>
+                            <canvas id="date-chart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Students Page -->
+        <div id="manage-students-page" class="page-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">จัดการข้อมูลนักเรียน</h2>
+                    <button id="add-student-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        เพิ่มนักเรียน
+                    </button>
+                </div>
+                
+                <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4 mb-4">
+                    <div class="relative">
+                        <select id="manage-filter-section" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">ทุก Section</option>
+                            <option value="flute">Flute</option>
+                            <option value="clarinet">Clarinet</option>
+                            <option value="saxophone">Saxophone</option>
+                            <option value="trumpet">Trumpet</option>
+                            <option value="horn">Horn in F</option>
+                            <option value="euphonium">Euphonium</option>
+                            <option value="trombone">Trombone</option>
+                            <option value="tuba">Tuba</option>
+                            <option value="percussion">Percussion</option>
+                            <option value="chorus">Chorus</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <select id="manage-filter-class" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">ทุกระดับชั้น</option>
+                            <option value="ม.1">ม.1</option>
+                            <option value="ม.2">ม.2</option>
+                            <option value="ม.3">ม.3</option>
+                            <option value="ม.4">ม.4</option>
+                            <option value="ม.5">ม.5</option>
+                            <option value="ม.6">ม.6</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="manage-search-student" placeholder="ค้นหานักเรียน" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">รูป</th>
+                                <th class="py-3 px-6 text-left">เลขประจำตัว</th>
+                                <th class="py-3 px-6 text-left">ชื่อ-นามสกุล</th>
+                                <th class="py-3 px-6 text-left">ระดับชั้น</th>
+                                <th class="py-3 px-6 text-left">Section</th>
+                                <th class="py-3 px-6 text-center">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manage-student-list" class="text-gray-600 text-sm">
+                            <!-- Student management rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Users Page -->
+        <div id="manage-users-page" class="page-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">จัดการผู้ใช้งาน</h2>
+                    <button id="add-user-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        เพิ่มผู้ใช้งาน
+                    </button>
+                </div>
+                
+                <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4 mb-4">
+                    <div class="relative">
+                        <select id="filter-user-role" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">ทุกประเภทผู้ใช้</option>
+                            <option value="admin">Admin</option>
+                            <option value="teacher">ครูผู้สอน/หัวหน้าวง</option>
+                            <option value="section-leader">หัวหน้า Section</option>
+                            <option value="student">นักเรียน</option>
+                        </select>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="search-user" placeholder="ค้นหาผู้ใช้" class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">ชื่อผู้ใช้</th>
+                                <th class="py-3 px-6 text-left">ชื่อ-นามสกุล</th>
+                                <th class="py-3 px-6 text-left">ประเภทผู้ใช้</th>
+                                <th class="py-3 px-6 text-left">Section ที่ดูแล</th>
+                                <th class="py-3 px-6 text-center">สถานะ</th>
+                                <th class="py-3 px-6 text-center">การจัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list" class="text-gray-600 text-sm">
+                            <!-- User rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Settings Page -->
+        <div id="system-settings-page" class="page-content hidden">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">ตั้งค่าระบบ</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">ตั้งค่าทั่วไป</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อระบบ</label>
+                                <input type="text" id="system-name" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="ระบบเช็คชื่อวงดุริยางค์สากล - โรงเรียนเบญจมราชูทิศ จันทบุรี">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ภาคเรียน</label>
+                                <input type="text" id="system-semester" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="ภาคเรียนที่ 1 ปีการศึกษา 2566">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">วันเริ่มต้นภาคเรียน</label>
+                                <input type="date" id="system-start-date" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">วันสิ้นสุดภาคเรียน</label>
+                                <input type="date" id="system-end-date" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">ตั้งค่าการแจ้งเตือน</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="notify-absent" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="notify-absent" class="ml-2 block text-sm text-gray-700">แจ้งเตือนเมื่อนักเรียนขาดซ้อม</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="notify-consecutive-absent" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="notify-consecutive-absent" class="ml-2 block text-sm text-gray-700">แจ้งเตือนเมื่อนักเรียนขาดซ้อมติดต่อกัน</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">จำนวนวันที่ขาดติดต่อกันที่ต้องแจ้งเตือน</label>
+                                <input type="number" id="consecutive-absent-days" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="3" min="1">
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold mt-6 mb-4">ตั้งค่าการสำรองข้อมูล</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="auto-backup" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                                <label for="auto-backup" class="ml-2 block text-sm text-gray-700">สำรองข้อมูลอัตโนมัติ</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">ความถี่ในการสำรองข้อมูล</label>
+                                <select id="backup-frequency" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                    <option value="daily">ทุกวัน</option>
+                                    <option value="weekly">ทุกสัปดาห์</option>
+                                    <option value="monthly">ทุกเดือน</option>
+                                </select>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button id="backup-now" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">สำรองข้อมูลตอนนี้</button>
+                                <button id="restore-backup" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition">กู้คืนข้อมูล</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button id="save-settings" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition">บันทึกการตั้งค่า</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">เข้าสู่ระบบ</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                    <input type="text" id="login-username" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="login-password" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div id="login-error" class="text-red-500 text-sm hidden">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+                <div class="flex justify-end">
+                    <button id="login-submit" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition">เข้าสู่ระบบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Student Modal -->
+    <div id="student-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="student-modal-title" class="text-xl font-bold text-gray-800">เพิ่มนักเรียน</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex justify-center mb-4">
+                    <div class="relative">
+                        <img id="student-photo-preview" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjY2NjYyIgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyek0xMiA1YzEuNjYgMCAzIDEuMzQgMyAzcy0xLjM0IDMtMyAzLTMtMS4zNC0zLTMgMS4zNC0zIDMtM3ptMCAxOS4yYy0yLjUgMC00Ljcx" alt="Student Photo" class="w-32 h-32 rounded-full object-cover border-4 border-gray-200">
+                        <button id="upload-photo-btn" class="absolute bottom-0 right-0 bg-indigo-600 text-white rounded-full p-2 shadow-md hover:bg-indigo-700 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </button>
+                        <input type="file" id="student-photo-input" class="hidden" accept="image/*">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">เลขประจำตัว</label>
+                    <input type="text" id="student-id" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="เช่น 0001">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">คำนำหน้า</label>
+                    <select id="student-prefix" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="เด็กชาย">เด็กชาย</option>
+                        <option value="เด็กหญิง">เด็กหญิง</option>
+                        <option value="นาย">นาย</option>
+                        <option value="นางสาว">นางสาว</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ</label>
+                    <input type="text" id="student-firstname" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">นามสกุล</label>
+                    <input type="text" id="student-lastname" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ระดับชั้น</label>
+                    <select id="student-class" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="ม.1">ม.1</option>
+                        <option value="ม.2">ม.2</option>
+                        <option value="ม.3">ม.3</option>
+                        <option value="ม.4">ม.4</option>
+                        <option value="ม.5">ม.5</option>
+                        <option value="ม.6">ม.6</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Section</label>
+                    <select id="student-section" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="flute">Flute</option>
+                        <option value="clarinet">Clarinet</option>
+                        <option value="saxophone">Saxophone</option>
+                        <option value="trumpet">Trumpet</option>
+                        <option value="horn">Horn in F</option>
+                        <option value="euphonium">Euphonium</option>
+                        <option value="trombone">Trombone</option>
+                        <option value="tuba">Tuba</option>
+                        <option value="percussion">Percussion</option>
+                        <option value="chorus">Chorus</option>
+                    </select>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button class="close-modal bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button id="save-student" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div id="user-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="user-modal-title" class="text-xl font-bold text-gray-800">เพิ่มผู้ใช้งาน</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อผู้ใช้</label>
+                    <input type="text" id="user-username" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
+                    <input type="password" id="user-password" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                    <input type="text" id="user-fullname" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ประเภทผู้ใช้</label>
+                    <select id="user-role" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="admin">Admin</option>
+                        <option value="teacher">ครูผู้สอน/หัวหน้าวง</option>
+                        <option value="section-leader">หัวหน้า Section</option>
+                        <option value="student">นักเรียน</option>
+                    </select>
+                </div>
+                <div id="section-leader-options" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Section ที่ดูแล</label>
+                    <select id="user-section" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="flute">Flute</option>
+                        <option value="clarinet">Clarinet</option>
+                        <option value="saxophone">Saxophone</option>
+                        <option value="trumpet">Trumpet</option>
+                        <option value="horn">Horn in F</option>
+                        <option value="euphonium">Euphonium</option>
+                        <option value="trombone">Trombone</option>
+                        <option value="tuba">Tuba</option>
+                        <option value="percussion">Percussion</option>
+                        <option value="chorus">Chorus</option>
+                    </select>
+                </div>
+                <div id="student-user-options" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">เลือกนักเรียน</label>
+                    <select id="user-student" class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <!-- Student options will be populated here -->
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="user-active" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                    <label for="user-active" class="ml-2 block text-sm text-gray-700">เปิดใช้งาน</label>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button class="close-modal bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
+                    <button id="save-user" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div id="student-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="student-detail-name" class="text-xl font-bold text-gray-800">ข้อมูลนักเรียน</h3>
+                <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex flex-col md:flex-row mb-6">
+                <div class="md:w-1/3 flex flex-col items-center mb-4 md:mb-0">
+                    <img id="detail-student-photo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2NjY2NjYyIgd2lkdGg9IjEyOCIgaGVpZ2h0PSIxMjgiPjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyek0xMiA1YzEuNjYgMCAzIDEuMzQgMyAzcy0xLjM0IDMtMyAzLTMtMS4zNC0zLTMgMS4zNC0zIDMtM3ptMCAxOS4yYy0yLjUgMC00Ljcx" alt="Student Photo" class="w-40 h-40 rounded-full object-cover border-4 border-gray-200 mb-2">
+                    <div id="detail-student-id" class="text-lg font-semibold">0001</div>
+                    <div id="detail-student-fullname" class="text-gray-600">เด็กชายวานิดา ฟาคิม</div>
+                    <div class="flex items-center mt-2">
+                        <span id="detail-student-class" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm mr-2">ม.1</span>
+                        <span id="detail-student-section" class="section-saxophone text-gray-700 px-3 py-1 rounded-full text-sm">Saxophone</span>
+                    </div>
+                </div>
+                
+                <div class="md:w-2/3 md:pl-6">
+                    <h4 class="text-lg font-semibold mb-3">สรุปการเข้าซ้อม</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div class="bg-green-100 p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-green-500 rounded-full p-1 mr-2">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">มาซ้อม</p>
+                                    <p class="text-lg font-bold text-gray-800"><span id="detail-present-count">0</span> วัน</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-red-500 rounded-full p-1 mr-2">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">ไม่มาซ้อม</p>
+                                    <p class="text-lg font-bold text-gray-800"><span id="detail-absent-count">0</span> วัน</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="bg-yellow-500 rounded-full p-1 mr-2">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-600">ลา</p>
+                                    <p class="text-lg font-bold text-gray-800"><span id="detail-leave-count">0</span> วัน</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="bg-gray-100 rounded-lg p-3">
+                            <p class="text-xs text-gray-600">เปอร์เซ็นต์การมาซ้อม</p>
+                            <div class="flex items-center">
+                                <div class="w-full bg-gray-200 rounded-full h-3 mr-2">
+                                    <div id="detail-attendance-percentage-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%"></div>
+                                </div>
+                                <span id="detail-attendance-percentage" class="text-sm font-medium">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3">แนวโน้มการเข้าซ้อม</h4>
+                        <canvas id="student-trend-chart" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <h4 class="text-lg font-semibold mb-3">บันทึกพฤติกรรม</h4>
+                <div class="border rounded-lg p-4 bg-gray-50">
+                    <textarea id="student-behavior-notes" class="w-full h-32 border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="บันทึกพฤติกรรมของนักเรียน..."></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button id="save-behavior-notes" class="bg-indigo-600 text-white px-4 py-1 rounded-md hover:bg-indigo-700 transition text-sm">บันทึก</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-3">ประวัติการเข้าซ้อม</h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">วันที่</th>
+                                <th class="py-3 px-6 text-center">สถานะ</th>
+                                <th class="py-3 px-6 text-left">บันทึก</th>
+                                <th class="py-3 px-6 text-left">เวลาบันทึก</th>
+                                <th class="py-3 px-6 text-left">ผู้บันทึก</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-attendance-history" class="text-gray-600 text-sm">
+                            <!-- Attendance history will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-green-100 rounded-full p-3">
+                    <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-2">บันทึกข้อมูลเรียบร้อย</h3>
+            <p id="success-message" class="text-gray-600 text-center mb-4">บันทึกข้อมูลการเช็คชื่อเรียบร้อยแล้ว</p>
+            <div id="success-stats" class="grid grid-cols-3 gap-2 mb-4">
+                <div class="bg-green-100 p-2 rounded-lg text-center">
+                    <p class="text-xs text-gray-600">มาซ้อม</p>
+                    <p class="text-lg font-bold text-gray-800"><span id="success-present-count">0</span> คน</p>
+                </div>
+                <div class="bg-red-100 p-2 rounded-lg text-center">
+                    <p class="text-xs text-gray-600">ไม่มาซ้อม</p>
+                    <p class="text-lg font-bold text-gray-800"><span id="success-absent-count">0</span> คน</p>
+                </div>
+                <div class="bg-yellow-100 p-2 rounded-lg text-center">
+                    <p class="text-xs text-gray-600">ลา</p>
+                    <p class="text-lg font-bold text-gray-800"><span id="success-leave-count">0</span> คน</p>
+                </div>
+            </div>
+            <div class="mb-4">
+                <div class="bg-gray-100 rounded-lg p-3">
+                    <p class="text-xs text-gray-600 text-center">เปอร์เซ็นต์การมาซ้อม</p>
+                    <div class="flex items-center">
+                        <div class="w-full bg-gray-200 rounded-full h-3 mr-2">
+                            <div id="success-percentage-bar" class="bg-green-500 h-3 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <span id="success-percentage" class="text-sm font-medium">0%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <button id="success-close" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex items-center justify-center mb-4">
+                <div class="bg-red-100 rounded-full p-3">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 text-center mb-2">ยืนยันการลบ</h3>
+            <p id="delete-message" class="text-gray-600 text-center mb-6">คุณต้องการลบข้อมูลนี้ใช่หรือไม่?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="cancel-delete" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition">ยกเลิก</button>
+                <button id="confirm-delete" class="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition">ลบ</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
